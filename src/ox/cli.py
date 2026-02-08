@@ -183,7 +183,14 @@ def init(name: str) -> None:
     subprocess.run(["git", "init"], cwd=project_dir, capture_output=True, check=True)
     subprocess.run(["git", "add", "."], cwd=project_dir, capture_output=True, check=True)
     subprocess.run(
-        ["git", "commit", "-m", "Initial project scaffold from ox init"],
+        [
+            "git",
+            "-c", "user.name=ox",
+            "-c", "user.email=ox@oxen-team",
+            "commit",
+            "-m",
+            "Initial project scaffold from ox init",
+        ],
         cwd=project_dir,
         capture_output=True,
         check=True,
