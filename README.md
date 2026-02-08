@@ -7,7 +7,7 @@ Like a good ox: strong work ethic, no tangles. Think of it as a yak that went to
 ## Install
 
 ```bash
-uv add ox-ai
+uv add oxen-team
 ```
 
 ## Quick Start
@@ -105,7 +105,7 @@ tracker.log({"loss": 0.5, "acc": 0.9}, step=10)
 
 Backends:
 - **local** (default) — JSONL files in `.ox/metrics/`
-- **wandb** — Weights & Biases (`uv add 'ox-ai[wandb]'`)
+- **wandb** — Weights & Biases (`uv add 'oxen-team[wandb]'`)
 
 Configure in `ox.yaml`:
 

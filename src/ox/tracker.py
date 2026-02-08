@@ -96,7 +96,7 @@ class WandbTracker:
             import wandb
         except ImportError:
             raise ImportError(
-                "wandb is required for WandbTracker. Install it with: uv add 'ox-ai[wandb]'"
+                "wandb is required for WandbTracker. Install it with: uv add 'oxen-team[wandb]'"
             ) from None
 
         self._run = wandb.init(

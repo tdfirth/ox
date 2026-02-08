@@ -126,7 +126,7 @@ Metrics are logged via the Tracker interface. Call `tracker.log({"loss": 0.5}, s
 The backend is configured in ox.yaml (currently: {{TRACKER_BACKEND}}).
 
 - **local**: Writes JSONL files to `.ox/metrics/`. Good for development.
-- **wandb**: Logs to Weights & Biases. Install with `uv add 'ox-ai[wandb]'`.
+- **wandb**: Logs to Weights & Biases. Install with `uv add 'oxen-team[wandb]'`.
 
 ## Skills
 

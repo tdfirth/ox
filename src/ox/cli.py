@@ -113,7 +113,7 @@ def init(name: str) -> None:
         f'description = ""\n'
         f'requires-python = ">=3.11"\n'
         f"dependencies = [\n"
-        f'    "ox-ai",\n'
+        f'    "oxen-team",\n'
         f"]\n"
         f"\n"
         f"[build-system]\n"
