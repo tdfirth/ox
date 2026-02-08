@@ -1,0 +1,6 @@
+project:
+  name: "{{PROJECT_NAME}}"
+
+tracker:
+  backend: local
+  output_dir: .ox/metrics
