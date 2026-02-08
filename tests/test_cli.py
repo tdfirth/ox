@@ -17,6 +17,42 @@ def runner() -> CliRunner:
     return CliRunner()
 
 
+class TestRootCommand:
+    def test_outside_project(
+        self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(cli, [])
+        assert result.exit_code == 0
+        assert "Not inside an ox project" in result.output
+
+    def test_inside_project_no_experiments(
+        self, runner: CliRunner, tmp_project: Path, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.chdir(tmp_project)
+        result = runner.invoke(cli, [])
+        assert result.exit_code == 0
+        assert "test-project" in result.output
+        assert "studies: 0" in result.output
+        assert "experiments: 0" in result.output
+        assert "No experiments yet" in result.output
+
+    def test_inside_project_with_experiments(
+        self,
+        runner: CliRunner,
+        tmp_project: Path,
+        sample_experiment: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(tmp_project)
+        result = runner.invoke(cli, [])
+        assert result.exit_code == 0
+        assert "test-project" in result.output
+        assert "studies: 1" in result.output
+        assert "experiments: 1" in result.output
+        assert "1 completed" in result.output
+
+
 class TestInit:
     def test_creates_project_structure(
         self, runner: CliRunner, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
@@ -114,6 +150,31 @@ class TestNewExperiment:
 
 
 class TestRun:
+    def test_warns_outside_project(
+        self,
+        runner: CliRunner,
+        tmp_path: Path,
+        tmp_script: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(cli, ["run", str(tmp_script)])
+        assert result.exit_code == 0, result.output
+        assert "Warning: not inside an ox project" in result.output
+        assert "Run completed" in result.output
+
+    def test_experiment_fails_outside_project(
+        self,
+        runner: CliRunner,
+        tmp_path: Path,
+        tmp_script: Path,
+        monkeypatch: pytest.MonkeyPatch,
+    ) -> None:
+        monkeypatch.chdir(tmp_path)
+        result = runner.invoke(cli, ["run", str(tmp_script), "--experiment", "foo"])
+        assert result.exit_code != 0
+        assert "Cannot use --experiment outside an ox project" in result.output
+
     def test_runs_script(
         self,
         runner: CliRunner,

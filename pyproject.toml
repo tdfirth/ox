@@ -20,6 +20,7 @@ wandb = ["wandb>=0.16"]
 dev = [
     "pytest",
     "ruff",
+    "ty",
 ]
 
 [project.scripts]

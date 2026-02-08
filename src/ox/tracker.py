@@ -132,7 +132,11 @@ def get_tracker(config: dict[str, Any] | None = None) -> Tracker:
 
         from ox.experiments import find_project_root
 
-        root = find_project_root()
+        try:
+            root = find_project_root()
+        except FileNotFoundError:
+            logger.warning("No ox.yaml found, using LocalTracker with defaults")
+            return LocalTracker()
         ox_yaml = root / "ox.yaml"
         if not ox_yaml.exists():
             logger.warning("No ox.yaml found, using LocalTracker with defaults")

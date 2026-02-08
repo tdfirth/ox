@@ -36,9 +36,50 @@ def _pkg_name(name: str) -> str:
     return _slugify(name).replace("-", "_")
 
 
-@click.group()
-def cli() -> None:
+@click.group(invoke_without_command=True)
+@click.pass_context
+def cli(ctx: click.Context) -> None:
     """ox — lightweight experiment management for AI research."""
+    if ctx.invoked_subcommand is not None:
+        return
+
+    try:
+        root = find_project_root()
+    except FileNotFoundError:
+        click.echo("ox — lightweight experiment management for AI research")
+        click.echo()
+        click.echo("Not inside an ox project. Run 'ox init <name>' to create one.")
+        click.echo("Run 'ox --help' for all commands.")
+        return
+
+    import yaml
+
+    ox_yaml = root / "ox.yaml"
+    project_name = root.name
+    if ox_yaml.exists():
+        with open(ox_yaml) as f:
+            config = yaml.safe_load(f)
+        if config and config.get("project", {}).get("name"):
+            project_name = config["project"]["name"]
+
+    experiments = load_all_experiments(root)
+    studies = {e.study for e in experiments}
+    by_status = {}
+    for exp in experiments:
+        by_status[exp.status.value] = by_status.get(exp.status.value, 0) + 1
+
+    click.echo(f"ox — {project_name}")
+    click.echo(f"  root: {root}")
+    click.echo(f"  studies: {len(studies)}")
+    click.echo(f"  experiments: {len(experiments)}")
+    if by_status:
+        summary = ", ".join(f"{v} {k}" for k, v in sorted(by_status.items()))
+        click.echo(f"  ({summary})")
+    else:
+        click.echo()
+        click.echo("No experiments yet. Get started:")
+        click.echo('  ox new study "my study"')
+        click.echo("  ox new experiment my-study baseline")
 
 
 @cli.command()
@@ -252,6 +293,20 @@ def run(
     overrides: tuple[str, ...],
 ) -> None:
     """Run a training script."""
+    in_project = True
+    try:
+        find_project_root()
+    except FileNotFoundError:
+        in_project = False
+        click.echo(
+            "Warning: not inside an ox project (no ox.yaml found).\n"
+            "Tracker will use defaults. If your script has dependencies\n"
+            "not installed in the current environment, this may fail.\n"
+            "Consider running from within your project with 'oxen-team'\n"
+            "as a dependency, or run 'ox init <name>' to create a project.\n",
+            err=True,
+        )
+
     config_cls, main_fn = discover_entry(script)
 
     cli_overrides = parse_cli_overrides(list(overrides), config_cls) if overrides else {}
@@ -261,6 +316,11 @@ def run(
     exp_path: Path | None = None
 
     if experiment_id:
+        if not in_project:
+            raise click.ClickException(
+                "Cannot use --experiment outside an ox project.\n"
+                "Run from within your project directory."
+            )
         try:
             root = find_project_root()
             exp, exp_path = find_experiment(experiment_id, root)
