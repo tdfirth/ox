@@ -185,8 +185,10 @@ def init(name: str) -> None:
     subprocess.run(
         [
             "git",
-            "-c", "user.name=ox",
-            "-c", "user.email=ox@oxen-team",
+            "-c",
+            "user.name=ox",
+            "-c",
+            "user.email=ox@oxen-team",
             "commit",
             "-m",
             "Initial project scaffold from ox init",
