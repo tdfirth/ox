@@ -1,13 +1,11 @@
-"""Tests for ox.cli — Click-based CLI commands."""
-
-from __future__ import annotations
+"""Tests for ox.cli — Typer-based CLI commands."""
 
 import json
 from pathlib import Path
 
 import pytest
 import yaml
-from click.testing import CliRunner
+from typer.testing import CliRunner
 
 from ox.cli import cli
 
